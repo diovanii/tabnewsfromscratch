@@ -2,6 +2,35 @@ import database from "infra/database.js";
 import password from "models/password.js";
 import { ValidationError, NotFoundError } from "infra/errors.js";
 
+async function create(userInputValues) {
+  await validateUniqueUsername(userInputValues.username);
+  await validateUniqueEmail(userInputValues.email);
+  await hashPasswordInObject(userInputValues);
+  await injectDefaultFeaturesInObject(userInputValues);
+
+  const newUser = await runInsertQuery(userInputValues);
+
+  return newUser;
+
+  async function runInsertQuery(userInputValues) {
+    const results = await database.query({
+      text: "INSERT INTO users (username, email, password, features) VALUES ($1, $2, $3, $4) RETURNING *;",
+      values: [
+        userInputValues.username,
+        userInputValues.email,
+        userInputValues.password,
+        userInputValues.features,
+      ],
+    });
+
+    return results.rows[0];
+  }
+
+  async function injectDefaultFeaturesInObject(userInputValues) {
+    userInputValues.features = ["read:activation_token"];
+  }
+}
+
 async function findOneById(userId) {
   const userFound = await runSelectQuery(userId);
 
@@ -63,29 +92,6 @@ async function findOneByEmail(email) {
         action: "Verifique se o email está digitado corretamente",
       });
     }
-
-    return results.rows[0];
-  }
-}
-
-async function create(userInputValues) {
-  await validateUniqueUsername(userInputValues.username);
-  await validateUniqueEmail(userInputValues.email);
-  await hashPasswordInObject(userInputValues);
-
-  const newUser = await runInsertQuery(userInputValues);
-
-  return newUser;
-
-  async function runInsertQuery(userInputValues) {
-    const results = await database.query({
-      text: "INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *;",
-      values: [
-        userInputValues.username,
-        userInputValues.email,
-        userInputValues.password,
-      ],
-    });
 
     return results.rows[0];
   }
