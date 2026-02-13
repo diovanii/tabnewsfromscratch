@@ -4,6 +4,7 @@ import database from "infra/database.js";
 import migrator from "models/migrator.js";
 import user from "models/user.js";
 import session from "models/session.js";
+import activation from "models/activation";
 
 const emailHttpUrl = `http://${process.env.EMAIL_HTTP_HOST}:${process.env.EMAIL_HTTP_PORT}`;
 
@@ -51,11 +52,15 @@ async function runPendingMigrations() {
 async function createUser(userObject) {
   return await user.create({
     username:
-      userObject.username ||
+      userObject?.username ||
       faker.internet.username().replace(/[^a-zA-Z0-9]/g, ""),
-    email: userObject.email || faker.internet.email(),
-    password: userObject.password || "valid password",
+    email: userObject?.email || faker.internet.email(),
+    password: userObject?.password || "valid password",
   });
+}
+
+async function activateUser(userObject) {
+  return activation.activateUserByUserId(userObject.id);
 }
 
 async function createSession(userId) {
@@ -71,6 +76,10 @@ async function getLastEmail() {
   const emailListBody = await emailListResponse.json();
   const lastEmailItem = emailListBody.pop();
 
+  if (!lastEmailItem) {
+    return null;
+  }
+
   const emailTextResponse = await fetch(
     `${emailHttpUrl}/messages/${lastEmailItem.id}.plain`,
   );
@@ -82,14 +91,24 @@ async function getLastEmail() {
   return lastEmailItem;
 }
 
+async function extractUUID(emailText) {
+  const regexMatch = emailText.match(/[0-9a-fA-F-]{36}/);
+
+  const activationToken = regexMatch[0] || null;
+
+  return activationToken;
+}
+
 const orchestrator = {
   waitForAllServices,
   clearDatabase,
   runPendingMigrations,
   createUser,
+  activateUser,
   createSession,
   clearMailBox,
   getLastEmail,
+  extractUUID,
 };
 
 export default orchestrator;
