@@ -18,7 +18,7 @@ describe("Use case: Registration Flow (all successful)", () => {
 
   test("🟢 Create user account", async () => {
     const createdUserResponse = await fetch(
-      "http://localhost:3000/api/v1/users",
+      `${webserver.origin}/api/v1/users`,
       {
         method: "POST",
         headers: {
@@ -66,7 +66,7 @@ describe("Use case: Registration Flow (all successful)", () => {
 
   test("🟢 Activate account", async () => {
     const activationResponse = await fetch(
-      `http://localhost:3000/api/v1/activations/${activationToken}`,
+      `${webserver.origin}/api/v1/activations/${activationToken}`,
       {
         method: "PATCH",
       },
@@ -88,7 +88,7 @@ describe("Use case: Registration Flow (all successful)", () => {
 
   test("🟢 Login", async () => {
     const createSessionResponse = await fetch(
-      "http://localhost:3000/api/v1/sessions",
+      `${webserver.origin}/api/v1/sessions`,
       {
         method: "POST",
         headers: {
@@ -109,7 +109,7 @@ describe("Use case: Registration Flow (all successful)", () => {
   test("🟢 Get user information", async () => {
     authorization.can(createdUserResponseBody, "create:session");
 
-    const userResponse = await fetch("http://localhost:3000/api/v1/user", {
+    const userResponse = await fetch(`${webserver.origin}/api/v1/user`, {
       headers: {
         cookie: `session_id=${createSessionResponseBody.token}`,
       },
