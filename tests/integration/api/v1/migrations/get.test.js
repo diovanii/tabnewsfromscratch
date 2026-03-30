@@ -54,6 +54,7 @@ describe("GET /api/v1/migrations", () => {
       await orchestrator.addFeaturesToUser(createdUser, ["read:migration"]);
       const sessionObject = await orchestrator.createSession(activatedUser);
 
+      console.log(activatedUser);
       const response = await fetch("http://localhost:3000/api/v1/migrations", {
         headers: {
           Cookie: `session_id=${sessionObject.token}`,

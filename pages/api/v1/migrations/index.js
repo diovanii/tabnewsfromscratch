@@ -17,7 +17,7 @@ async function getHandler(request, response) {
 
   const secureOutputValues = authorization.filterOutput(
     userTryingToGet,
-    "read:migrations",
+    "read:migration",
     pendingMigrations,
   );
 
@@ -34,7 +34,7 @@ async function postHandler(request, response) {
 
   const secureOutputValues = authorization.filterOutput(
     userTryingToPost,
-    "read:migrations",
+    "read:migration",
     migratedMigrations,
   );
 

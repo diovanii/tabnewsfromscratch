@@ -107,7 +107,7 @@ describe("Use case: Registration Flow (all successful)", () => {
   });
 
   test("🟢 Get user information", async () => {
-    authorization.can(createdUserResponseBody, ["create:session"]);
+    authorization.can(createdUserResponseBody, "create:session");
 
     const userResponse = await fetch("http://localhost:3000/api/v1/user", {
       headers: {
