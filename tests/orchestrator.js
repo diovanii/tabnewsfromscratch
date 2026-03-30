@@ -63,8 +63,14 @@ async function activateUser(userObject) {
   return activation.activateUserByUserId(userObject.id);
 }
 
-async function createSession(userId) {
-  return await session.create(userId);
+async function addFeaturesToUser(userObject, features) {
+  const updatedUser = await user.addFeatures(userObject.id, features);
+
+  return updatedUser;
+}
+
+async function createSession(userObject) {
+  return await session.create(userObject.id);
 }
 
 async function clearMailBox() {
@@ -105,6 +111,7 @@ const orchestrator = {
   runPendingMigrations,
   createUser,
   activateUser,
+  addFeaturesToUser,
   createSession,
   clearMailBox,
   getLastEmail,

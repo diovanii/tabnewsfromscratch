@@ -39,9 +39,7 @@ describe("Use case: Registration Flow (all successful)", () => {
     expect(createdUserResponseBody).toEqual({
       id: createdUserResponseBody.id,
       username: "usuarioFluxoRegistro",
-      email: "usuarioFluxoRegistro@samba.com",
       features: ["read:activation_token"],
-      password: createdUserResponseBody.password,
       created_at: createdUserResponseBody.created_at,
       updated_at: createdUserResponseBody.updated_at,
     });
@@ -81,7 +79,11 @@ describe("Use case: Registration Flow (all successful)", () => {
     expect(Date.parse(activationResponseBody.used_at)).not.toBeNaN();
 
     const activatedUser = await user.findOneByUsername("usuarioFluxoRegistro");
-    expect(activatedUser.features).toEqual(["create:session", "read:session"]);
+    expect(activatedUser.features).toEqual([
+      "create:session",
+      "read:session",
+      "update:user",
+    ]);
   });
 
   test("🟢 Login", async () => {
@@ -105,7 +107,7 @@ describe("Use case: Registration Flow (all successful)", () => {
   });
 
   test("🟢 Get user information", async () => {
-    authorization.can(createdUserResponseBody, ["create:session"]);
+    authorization.can(createdUserResponseBody, "create:session");
 
     const userResponse = await fetch("http://localhost:3000/api/v1/user", {
       headers: {

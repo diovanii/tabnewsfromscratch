@@ -146,13 +146,14 @@ describe("PATCH /api/v1/activations/[token_id]", () => {
       expect(activatedUser.features).toEqual([
         "create:session",
         "read:session",
+        "update:user",
       ]);
     });
 
     test("🔴 With valid token but already activated user", async () => {
       const createdUser = await orchestrator.createUser();
-      await orchestrator.activateUser(createdUser);
-      const activationToken = await activation.create(createdUser.id);
+      const activatedUser = await orchestrator.activateUser(createdUser);
+      const activationToken = await activation.create(activatedUser.id);
 
       const response = await fetch(
         `http://localhost:3000/api/v1/activations/${activationToken.id}`,
@@ -179,7 +180,7 @@ describe("PATCH /api/v1/activations/[token_id]", () => {
       const user1 = await orchestrator.createUser();
       await orchestrator.activateUser(user1);
 
-      const userSessionObject1 = await orchestrator.createSession(user1.id);
+      const userSessionObject1 = await orchestrator.createSession(user1);
 
       const user2 = await orchestrator.createUser();
       const userActivationToken2 = await activation.create(user2.id);
