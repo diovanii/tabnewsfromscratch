@@ -3,7 +3,10 @@ import webserver from "infra/webserver.js";
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices();
+  await orchestrator.clearDatabase();
+  await orchestrator.runPendingMigrations();
 });
+
 describe("GET api/v1/status", () => {
   describe("Anonymous user", () => {
     test("Retrieving current system status", async () => {
